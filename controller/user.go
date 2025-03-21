@@ -1,38 +1,39 @@
 package controller
 
 import (
-	"gin-learn-notes/config"
-	"gin-learn-notes/model"
+	"errors"
+	"gin-learn-notes/request"
+	"gin-learn-notes/service"
+	"gin-learn-notes/utils"
 	"github.com/gin-gonic/gin"
-	"net/http"
+	"github.com/go-playground/validator/v10"
 )
 
-type RegisterRequest struct {
-	Name string `json:"name"`
-	Age  int    `json:"age"`
-}
-
 func Register(c *gin.Context) {
-	var req RegisterRequest
+	var req request.RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "参数错误：" + err.Error(),
-		})
+		// 使用 validator 类型断言
+		var ve validator.ValidationErrors
+		if errors.As(err, &ve) {
+			fieldMap := map[string]string{
+				"Name": "用户名",
+				"Age":  "年龄",
+			}
+			msg := utils.TranslateValidationError(ve, fieldMap)
+			utils.Fail(c, msg)
+		} else {
+			// 其他绑定错误，如 JSON 格式错误
+			utils.Fail(c, "参数格式不正确")
+		}
 		return
 	}
 
-	user := model.User{
-		Name: req.Name,
-		Age:  req.Age,
+	user, err := service.RegisterUser(req)
+	if err != nil {
+		utils.Fail(c, "保存用户失败:"+err.Error())
 	}
 
-	if err := config.DB.Create(&user).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "用户保存失败"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "注册成功",
+	utils.Success(c, gin.H{
 		"user_id": user.ID,
 	})
 }
