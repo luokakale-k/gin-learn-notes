@@ -2,6 +2,7 @@ package main
 
 import (
 	"gin-learn-notes/config"
+	"gin-learn-notes/logger"
 	"gin-learn-notes/model"
 	"gin-learn-notes/router"
 )
@@ -9,6 +10,10 @@ import (
 func main() {
 	// 初始化数据库
 	config.InitDB()
+
+	// 初始化日志
+	logger.InitLogger()
+	defer logger.Log.Sync()
 
 	// 自动建表
 	config.DB.AutoMigrate(&model.User{})

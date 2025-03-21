@@ -3,6 +3,7 @@ package controller
 import (
 	"errors"
 	"gin-learn-notes/core/response"
+	"gin-learn-notes/logger"
 	"gin-learn-notes/request"
 	"gin-learn-notes/service"
 	"gin-learn-notes/utils"
@@ -110,6 +111,8 @@ func UserList(c *gin.Context) {
 		response.Fail(c, response.DBError, "获取用户列表失败")
 		return
 	}
+
+	logger.Log.Info("用户列表：", users)
 
 	response.Success(c, response.PageData{
 		List:     users,
