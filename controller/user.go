@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"gin-learn-notes/config"
+	"gin-learn-notes/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -19,9 +21,18 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	// 返回欢迎消息
+	user := model.User{
+		Name: req.Name,
+		Age:  req.Age,
+	}
+
+	if err := config.DB.Create(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "用户保存失败"})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"message": "欢迎 " + req.Name,
-		"age":     req.Age,
+		"message": "注册成功",
+		"user_id": user.ID,
 	})
 }
