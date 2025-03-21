@@ -1,0 +1,17 @@
+# config.yaml
+
+app:
+  name: go-learn-notes
+  port: 8080
+
+mysql:
+  host: 127.0.0.1
+  port: 3306
+  user: root
+  password: 123456
+  database: demo
+  charset: utf8mb4
+
+logger:
+  level: info            # 支持：debug / info / warn / error
+  file: logs/app.log     # 日志输出文件（建议提前 mkdir logs）
