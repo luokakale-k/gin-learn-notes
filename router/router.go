@@ -14,5 +14,13 @@ func InitRouter() *gin.Engine {
 
 	r.POST("/register", controller.Register)
 
+	r.POST("/info", controller.GetUserInfo)
+
+	r.POST("/save", controller.UpdateUser)
+
+	r.POST("/delete", controller.DeleteUser)
+
+	r.POST("/list", controller.UserList)
+
 	return r
 }
