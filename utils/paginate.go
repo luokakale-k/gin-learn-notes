@@ -2,13 +2,6 @@ package utils
 
 import "gorm.io/gorm"
 
-type PageData struct {
-	List     interface{} `json:"list"`
-	Total    int64       `json:"total"`
-	Page     int         `json:"page"`
-	PageSize int         `json:"page_size"`
-}
-
 // 泛型分页函数
 func Paginate[T any](db *gorm.DB, page, pageSize int) ([]T, int64, error) {
 	var list []T
