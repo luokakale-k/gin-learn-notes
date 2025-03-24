@@ -121,3 +121,19 @@ func UserList(c *gin.Context) {
 		PageSize: req.PageSize,
 	})
 }
+
+func GetUserProfile(c *gin.Context) {
+	var req request.GetUserInfoRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.Fail(c, response.ParamError, "参数错误")
+		return
+	}
+
+	user, err := service.GetUserProfileWithCache(req.ID)
+	if err != nil {
+		response.Fail(c, response.NotFound, "用户不存在")
+		return
+	}
+
+	response.Success(c, user)
+}

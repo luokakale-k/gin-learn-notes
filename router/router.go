@@ -22,5 +22,7 @@ func InitRouter() *gin.Engine {
 
 	r.POST("/list", controller.UserList)
 
+	r.POST("/profile", controller.GetUserProfile)
+
 	return r
 }

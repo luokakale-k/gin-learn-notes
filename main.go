@@ -15,6 +15,9 @@ func main() {
 	// 初始化数据库
 	config.InitDB()
 
+	// 初始化 Redis
+	config.InitRedis()
+
 	// 初始化日志
 	logger.InitLogger()
 	defer logger.Log.Sync()

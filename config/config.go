@@ -21,11 +21,18 @@ type Logger struct {
 	File  string `mapstructure:"file"`
 }
 
+type Redis struct {
+	Addr     string
+	Password string
+	DB       int
+}
+
 // Config 总配置结构体（对应 config.yaml）
 type Config struct {
 	App    App       `mapstructure:"app"`
 	MySQL  MySQLInfo `mapstructure:"mysql"`
 	Logger Logger    `mapstructure:"logger"`
+	Redis  Redis     `mapstructure:"redis"`
 }
 
 var Conf *Config

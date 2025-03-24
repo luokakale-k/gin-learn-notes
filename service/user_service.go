@@ -1,11 +1,14 @@
 package service
 
 import (
+	"encoding/json"
+	"fmt"
 	"gin-learn-notes/config"
 	"gin-learn-notes/model"
 	"gin-learn-notes/request"
 	"gin-learn-notes/utils"
 	"strings"
+	"time"
 )
 
 func RegisterUser(req request.RegisterRequest) (*model.User, error) {
@@ -79,4 +82,29 @@ func GetUserList(req request.UserListRequest) ([]model.User, int64, error) {
 	}
 
 	return utils.Paginate[model.User](db, req.Page, req.PageSize)
+}
+
+// 使用缓存获取用户信息
+func GetUserProfileWithCache(userID uint) (*model.User, error) {
+	cacheKey := fmt.Sprintf("user:info:%d", userID)
+
+	// 先查询缓存
+	cacheStr, err := utils.RedisGet(cacheKey)
+	if err == nil && cacheStr != "" {
+		var user model.User
+		json.Unmarshal([]byte(cacheStr), &user)
+		return &user, nil
+	}
+
+	// 缓存未命中，查询数据库
+	user, err := GetUserByID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// 将查询结果写入缓存
+	userStr, _ := json.Marshal(user)
+	utils.RedisSet(cacheKey, string(userStr), 10*time.Minute)
+
+	return user, nil
 }
