@@ -6,6 +6,7 @@ import (
 	"gin-learn-notes/config"
 	"gin-learn-notes/model"
 	"gin-learn-notes/request"
+	"gin-learn-notes/response"
 	"gin-learn-notes/utils"
 	"strings"
 	"time"
@@ -107,4 +108,24 @@ func GetUserProfileWithCache(userID uint) (*model.User, error) {
 	utils.RedisSet(cacheKey, string(userStr), 10*time.Minute)
 
 	return user, nil
+}
+
+func DoLogin(username, password string) (*response.LoginResult, error) {
+	var user model.User
+	if err := config.DB.Where("name= ? AND password= ?", username, password).First(&user).Error; err != nil {
+		return nil, err
+	}
+
+	// 调用封装的 token 生成方法
+	token, err := utils.GenerateToken(user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	// 返回 token 和用户信息
+	return &response.LoginResult{
+		Token:    token,
+		UserID:   user.ID,
+		Username: user.Name,
+	}, nil
 }

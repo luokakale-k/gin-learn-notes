@@ -25,3 +25,8 @@ type UserListRequest struct {
 	MinAge  int    `json:"min_age"`
 	MaxAge  int    `json:"max_age"`
 }
+
+type LoginRequest struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}

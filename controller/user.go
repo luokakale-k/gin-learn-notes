@@ -123,17 +123,37 @@ func UserList(c *gin.Context) {
 }
 
 func GetUserProfile(c *gin.Context) {
-	var req request.GetUserInfoRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.Fail(c, response.ParamError, "参数错误")
+	userID := utils.GetUserID(c)
+	if userID == 0 {
+		response.Fail(c, response.Unauthorized, "未登录或 token 无效")
 		return
 	}
 
-	user, err := service.GetUserProfileWithCache(req.ID)
+	user, err := service.GetUserProfileWithCache(userID)
 	if err != nil {
 		response.Fail(c, response.NotFound, "用户不存在")
 		return
 	}
 
 	response.Success(c, user)
+}
+
+func Login(c *gin.Context) {
+	var req request.LoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.Fail(c, response.ParamError, "参数错误")
+		return
+	}
+
+	res, err := service.DoLogin(req.Username, req.Password)
+	if err != nil {
+		response.Fail(c, response.Unauthorized, "用户名或密码错误")
+		return
+	}
+
+	response.Success(c, gin.H{
+		"token":    res.Token,
+		"user_id":  res.UserID,
+		"username": res.Username,
+	})
 }

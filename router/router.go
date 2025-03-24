@@ -2,6 +2,7 @@ package router
 
 import (
 	"gin-learn-notes/controller"
+	"gin-learn-notes/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,7 +23,13 @@ func InitRouter() *gin.Engine {
 
 	r.POST("/list", controller.UserList)
 
-	r.POST("/profile", controller.GetUserProfile)
+	r.POST("/login", controller.Login)
 
+	// 需要登录的接口分组
+	auth := r.Group("/api")
+	auth.Use(middleware.JWTAuthMiddleware())
+	{
+		auth.POST("/profile", controller.GetUserProfile)
+	}
 	return r
 }
